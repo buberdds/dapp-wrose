@@ -19,9 +19,12 @@ permissions:
   id-token: write
 
 jobs:
-  build:
+  deploy:
     # NOTE: This name appears in GitHub's Checks API.
-    name: build
+    name: deploy
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -45,6 +48,8 @@ jobs:
           chmod -c -R +rX "dist/" | while read line; do
             echo "::warning title=Invalid file permissions automatically fixed::$line"
           done
+      - name: Setup Pages
+        uses: actions/configure-pages@v1
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v2
         with:
