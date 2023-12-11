@@ -41,6 +41,9 @@ jobs:
           done
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v2
+        with:
+          # Upload build artifacts from the dist/ directory.
+          path: 'dist/'
       # - name: Upload build artifacts
       #   # Upload build artifacts on push event.
       #   if: github.event_name == 'push'
