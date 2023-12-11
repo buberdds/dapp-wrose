@@ -3,14 +3,9 @@ name: release
 
 # Trigger the workflow when:
 on:
-  workflow_dispatch:
   # A push occurs to one of the matched branches.
-  # push:
-  # branches: [master]
-  # Or when a pull request event occurs for a pull request against one of the
-  # matched branches.
-  # pull_request:
-  # branches: [master]
+  push:
+    branches: [master]
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
@@ -22,9 +17,6 @@ jobs:
   deploy:
     # NOTE: This name appears in GitHub's Checks API.
     name: deploy
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -36,13 +28,9 @@ jobs:
           cache: yarn
       - name: Install dependencies
         run: yarn install --frozen-lockfile
-      - name: Set workflow variables
-        # Id is needed to access output in a next step.
-        id: vars
-        run: |
-          echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
       - name: Build app
         run: yarn build
+      # https://github.com/actions/upload-pages-artifact#example-permissions-fix-for-linux
       - name: Apply read permissions to build files
         run: |
           chmod -c -R +rX "dist/" | while read line; do
@@ -55,12 +43,5 @@ jobs:
         with:
           # Upload build artifacts from the dist/ directory.
           path: 'dist/'
-      # - name: Upload build artifacts
-      #   # Upload build artifacts on push event.
-      #   if: github.event_name == 'push'
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     name: oasis-dapp-wrose-${{ steps.vars.outputs.SHORT_SHA }}
-      #     path: build
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v3
